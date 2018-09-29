@@ -15,6 +15,7 @@ uint16_t checksum(uint16_t *buf, int nwords)
 
 ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
+
     /* TODO: Your code here. */
 
     /* Hint: Check the data length field 'len'.
@@ -41,27 +42,54 @@ int gbn_close(int sockfd){
 }
 
 int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
-
+    int numbytes;
     printf("In Connect() with socket: %d, server: %d, socklen: %d\n", sockfd, server->sa_family, socklen);
+
     gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
-
     memset(SYN_packet->data, 0, sizeof(SYN_packet->data));
-
     SYN_packet->type = SYN;
-    /*
-    char msg[2000] = "hello world";
-    */
 
-    sendto(sockfd, msg, sizeof(msg), 0,server,socklen);
+    /* init the SYNACK packet to be sent */
+    gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
+    memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
 
-    return(0);
+    printf("SYN packet type: %d\n", SYN_packet->type);
+
+    while(1) {
+        if (s.curr_state == CLOSED) {
+
+            if ((numbytes = sendto(sockfd, SYN_packet, sizeof(SYN_packet), 0, server, socklen)) == -1) {
+                perror("Sendto error");
+                exit(-1);
+            }
+
+            s.curr_state = SYN_SENT;
+
+            printf("Current state: %d\n", s.curr_state);
+        }
+
+        if (s.curr_state == SYN_SENT) {
+
+            recvfrom(sockfd, SYNACK_packet, sizeof(SYNACK_packet), 0, (struct sockaddr *)&server, &socklen);
+
+            if (SYNACK_packet->type == SYNACK) {
+
+                s.curr_state = ESTABLISHED;
+                printf("Current state: %d\n", s.curr_state);
+
+                return sockfd;
+            }
+
+        }
+    }
+    return(-1);
 }
 
 int gbn_listen(int sockfd, int backlog){
 
     /* here just change the state and return 0 */
     printf("In Listen func with sockfd %d and backlog %d \n", sockfd, backlog);
-    /* s.curr_state = */
+    s.curr_state = CLOSED;
     return(0);
 }
 
@@ -93,20 +121,42 @@ int gbn_socket(int domain, int type, int protocol){
 }
 
 int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
-    char buf[DATALEN];
+    /* char buf[DATALEN]; */
 
     printf("In Accept() socket: %d, client address: %d\n", sockfd, client->sa_family);
-    /*
-    gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
 
+    /* init SYN_packet to be populated */
+    gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
     memset(SYN_packet->data, 0, sizeof(SYN_packet->data));
-    */
+
+    /* init the SYNACK packet to be sent */
+    gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
+    memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
+    SYNACK_packet->type = SYNACK;
+
+
     while(1){
         printf("Accepting...\n");
-        int byte_count = recvfrom(sockfd, buf, DATALEN, 0, client, socklen);
-        printf("byte_count: %d\n", byte_count);
+        if (s.curr_state == CLOSED) {
+            int byte_count = recvfrom(sockfd, SYN_packet, sizeof(SYN_packet), 0, client, socklen);
+            printf("byte_count: %d\n", byte_count);
 
-        printf("data: %s", buf);
+            printf("data: %d\n", SYN_packet->type);
+        }
+
+        if (SYN_packet->type == SYN) {
+            s.curr_state = SYN_RCVD;
+            printf("Current state: %d\n", s.curr_state);
+
+            if (sendto(sockfd, SYNACK_packet, sizeof(SYNACK_packet), 0, client, *socklen) == -1) {
+                perror("SYNACK send error");
+                exit(-1); /* TODO retry sending SYNACK */
+            }
+            s.curr_state = ESTABLISHED;
+            printf("Current state: %d\n", s.curr_state);
+            return sockfd;
+        }
+
         printf("\n");
     }
 
