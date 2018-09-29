@@ -26,6 +26,7 @@ extern int errno;
 #define N         1024    /* Max number of packets a single call to gbn_send can process */
 #define TIMEOUT      1    /* timeout to resend packets (1 second)        */
 
+
 /*----- Packet types -----*/
 #define SYN      0        /* Opens a connection                          */
 #define SYNACK   1        /* Acknowledgement of the SYN packet           */
@@ -35,27 +36,33 @@ extern int errno;
 #define FINACK   5        /* Acknowledgement of the FIN packet           */
 #define RST      6        /* Reset packet used to reject new connections */
 
+#define BACKLOG 1
+
 /*----- Go-Back-n packet format -----*/
 typedef struct {
-	uint8_t  type;            /* packet type (e.g. SYN, DATA, ACK, FIN)     */
-	uint8_t  seqnum;          /* sequence number of the packet              */
+    uint8_t  type;            /* packet type (e.g. SYN, DATA, ACK, FIN)     */
+    uint8_t  seqnum;          /* sequence number of the packet              */
     uint16_t checksum;        /* header and payload checksum                */
     uint8_t data[DATALEN];    /* pointer to the payload                     */
 } __attribute__((packed)) gbnhdr;
 
 typedef struct state_t{
 
-	/* TODO: Your state information could be encoded here. */
+    int curr_state; /* ESTABLISHED, CLOSED, etc...*/
+    uint8_t seq_num;  /* the current sequence number */
+    uint8_t window_size; /* the current window size which should be reset to 1 when congestion */
+    struct sockaddr address; /* should be the destination address */
+    socklen_t sock_len; /* the size of that address */
 
 } state_t;
 
 enum {
-	CLOSED=0,
-	SYN_SENT,
-	SYN_RCVD,
-	ESTABLISHED,
-	FIN_SENT,
-	FIN_RCVD
+    CLOSED=0,
+    SYN_SENT,
+    SYN_RCVD,
+    ESTABLISHED,
+    FIN_SENT,
+    FIN_RCVD
 };
 
 extern state_t s;
@@ -75,5 +82,6 @@ ssize_t  maybe_recvfrom(int  s, char *buf, size_t len, int flags, \
 
 uint16_t checksum(uint16_t *buf, int nwords);
 
+#define h_addr h_addr_list[0] /* for backward compatibility */
 
 #endif

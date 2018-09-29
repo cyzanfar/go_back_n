@@ -1,1 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/hw1_skeleton.dir/gbn.c.o CMakeFiles/hw1_skeleton.dir/receiver.c.o CMakeFiles/hw1_skeleton.dir/sender.c.o  -o hw1_skeleton 

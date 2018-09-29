@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d5c52c6d-6900-4623-89db-64961081b61e" name="ec2-server" url="http://ec2-34-235-142-49.compute-1.amazonaws.com">
+        <fileTransfer host="ec2-34-235-142-49.compute-1.amazonaws.com" port="22" privateKey="$USER_HOME$/.ssh/GoBackNKeyPair.pem" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

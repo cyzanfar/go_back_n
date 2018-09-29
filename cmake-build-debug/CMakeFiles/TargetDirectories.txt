@@ -1,3 +1,3 @@
-/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles/hw1_skeleton.dir
+/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles/go_back_n.dir

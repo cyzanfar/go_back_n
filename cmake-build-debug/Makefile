@@ -48,10 +48,10 @@ RM = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton
+CMAKE_SOURCE_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named hw1_skeleton
+# Target rules for targets named go_back_n
 
 # Build rule for target.
-hw1_skeleton: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 hw1_skeleton
-.PHONY : hw1_skeleton
+go_back_n: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 go_back_n
+.PHONY : go_back_n
 
 # fast build rule for target.
-hw1_skeleton/fast:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/build
-.PHONY : hw1_skeleton/fast
+go_back_n/fast:
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/build
+.PHONY : go_back_n/fast
 
 gbn.o: gbn.c.o
 
@@ -129,7 +129,7 @@ gbn.o: gbn.c.o
 
 # target to build an object file
 gbn.c.o:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/gbn.c.o
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/gbn.c.o
 .PHONY : gbn.c.o
 
 gbn.i: gbn.c.i
@@ -138,7 +138,7 @@ gbn.i: gbn.c.i
 
 # target to preprocess a source file
 gbn.c.i:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/gbn.c.i
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/gbn.c.i
 .PHONY : gbn.c.i
 
 gbn.s: gbn.c.s
@@ -147,7 +147,7 @@ gbn.s: gbn.c.s
 
 # target to generate assembly for a file
 gbn.c.s:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/gbn.c.s
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/gbn.c.s
 .PHONY : gbn.c.s
 
 receiver.o: receiver.c.o
@@ -156,7 +156,7 @@ receiver.o: receiver.c.o
 
 # target to build an object file
 receiver.c.o:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/receiver.c.o
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/receiver.c.o
 .PHONY : receiver.c.o
 
 receiver.i: receiver.c.i
@@ -165,7 +165,7 @@ receiver.i: receiver.c.i
 
 # target to preprocess a source file
 receiver.c.i:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/receiver.c.i
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/receiver.c.i
 .PHONY : receiver.c.i
 
 receiver.s: receiver.c.s
@@ -174,7 +174,7 @@ receiver.s: receiver.c.s
 
 # target to generate assembly for a file
 receiver.c.s:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/receiver.c.s
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/receiver.c.s
 .PHONY : receiver.c.s
 
 sender.o: sender.c.o
@@ -183,7 +183,7 @@ sender.o: sender.c.o
 
 # target to build an object file
 sender.c.o:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/sender.c.o
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/sender.c.o
 .PHONY : sender.c.o
 
 sender.i: sender.c.i
@@ -192,7 +192,7 @@ sender.i: sender.c.i
 
 # target to preprocess a source file
 sender.c.i:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/sender.c.i
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/sender.c.i
 .PHONY : sender.c.i
 
 sender.s: sender.c.s
@@ -201,7 +201,7 @@ sender.s: sender.c.s
 
 # target to generate assembly for a file
 sender.c.s:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/sender.c.s
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/sender.c.s
 .PHONY : sender.c.s
 
 # Help Target
@@ -212,7 +212,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... hw1_skeleton"
+	@echo "... go_back_n"
 	@echo "... gbn.o"
 	@echo "... gbn.i"
 	@echo "... gbn.s"

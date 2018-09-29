@@ -1,4 +1,4 @@
-# Install script for directory: /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton
+# Install script for directory: /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

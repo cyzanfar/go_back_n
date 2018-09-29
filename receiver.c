@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in client;
 	FILE *outputFile;
 	socklen_t socklen;
+
 	
 	/*----- Checking arguments -----*/
 	if (argc != 3){
@@ -35,6 +36,8 @@ int main(int argc, char *argv[])
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
 	server.sin_port        = htons(atoi(argv[1]));
 
+	printf("server info: s_addr %d, port: %d\n", server.sin_addr.s_addr, server.sin_port);
+
 	/*----- Binding to the designated port -----*/
 	if (gbn_bind(sockfd, (struct sockaddr *)&server, sizeof(struct sockaddr_in)) == -1){
 		perror("gbn_bind");
@@ -49,6 +52,7 @@ int main(int argc, char *argv[])
 
 	/*----- Waiting for the client to connect -----*/
 	socklen = sizeof(struct sockaddr_in);
+	printf("About to accept with socket: %d\n", socklen);
 	newSockfd = gbn_accept(sockfd, (struct sockaddr *)&client, &socklen);
 	if (newSockfd == -1){
 		perror("gbn_accept");

@@ -59,45 +59,45 @@ RM = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton
+CMAKE_SOURCE_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug
 
 #=============================================================================
-# Target rules for target CMakeFiles/hw1_skeleton.dir
+# Target rules for target CMakeFiles/go_back_n.dir
 
 # All Build rule for target.
-CMakeFiles/hw1_skeleton.dir/all:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/depend
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4 "Built target hw1_skeleton"
-.PHONY : CMakeFiles/hw1_skeleton.dir/all
+CMakeFiles/go_back_n.dir/all:
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/depend
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4 "Built target go_back_n"
+.PHONY : CMakeFiles/go_back_n.dir/all
 
 # Include target in all.
-all: CMakeFiles/hw1_skeleton.dir/all
+all: CMakeFiles/go_back_n.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/hw1_skeleton.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/hw1_skeleton.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/hw1_skeleton/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/hw1_skeleton.dir/rule
+CMakeFiles/go_back_n.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/go_back_n.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cyrusghazanfar/Desktop/cornell-tech/dist-system/go_back_n/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/go_back_n.dir/rule
 
 # Convenience name for target.
-hw1_skeleton: CMakeFiles/hw1_skeleton.dir/rule
+go_back_n: CMakeFiles/go_back_n.dir/rule
 
-.PHONY : hw1_skeleton
-
-# clean rule for target.
-CMakeFiles/hw1_skeleton.dir/clean:
-	$(MAKE) -f CMakeFiles/hw1_skeleton.dir/build.make CMakeFiles/hw1_skeleton.dir/clean
-.PHONY : CMakeFiles/hw1_skeleton.dir/clean
+.PHONY : go_back_n
 
 # clean rule for target.
-clean: CMakeFiles/hw1_skeleton.dir/clean
+CMakeFiles/go_back_n.dir/clean:
+	$(MAKE) -f CMakeFiles/go_back_n.dir/build.make CMakeFiles/go_back_n.dir/clean
+.PHONY : CMakeFiles/go_back_n.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/go_back_n.dir/clean
 
 .PHONY : clean
 
