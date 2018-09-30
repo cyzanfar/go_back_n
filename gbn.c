@@ -87,18 +87,26 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
 int gbn_listen(int sockfd, int backlog){
 
-    /* here just change the state and return 0 */
-    printf("In Listen func with sockfd %d and backlog %d \n", sockfd, backlog);
+    /* ---- There is no need to listen. Using only UDP calls. ---- */
+
+    printf("In Listen(), sockfd: %d, backlog: %d \n", sockfd, backlog);
+
+    /* Setting the default to closed since there is no connection established yet */
     s.curr_state = CLOSED;
+
     return(0);
 }
 
 int gbn_bind(int sockfd, const struct sockaddr *server, socklen_t socklen){
+
     int status;
-    printf("In bind() func %d\n", sockfd);
+
+    printf("In bind(),  sockfd: %d\n", sockfd);
 
     if ((status = bind(sockfd, server, socklen)) == -1) {
+
         perror("Bind error");
+
         exit(-1);
     }
 
@@ -112,11 +120,18 @@ int gbn_socket(int domain, int type, int protocol){
 
     printf("domain: %d, type %d, protocol %d\n", domain, type, protocol);
 
+    /* Assign a random seq number used when sending or receiving packets */
     s.seq_num = (uint8_t)rand();
+
+    /* Set the size to 1. This state will be modified according to the go-back-n protocol */
     s.window_size = 1;
 
+    printf("Seq num: %d, Window size: %d\n", s.seq_num, s.window_size);
+
     int sockfd = socket(domain, type, protocol);
+
     printf("Socket created %d\n", sockfd);
+
     return sockfd;
 }
 

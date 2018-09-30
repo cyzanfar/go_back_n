@@ -51,8 +51,8 @@ typedef struct state_t{
     int curr_state; /* ESTABLISHED, CLOSED, etc...*/
     uint8_t seq_num;  /* the current sequence number */
     uint8_t window_size; /* the current window size which should be reset to 1 when congestion */
-    struct sockaddr address; /* should be the destination address */
-    socklen_t sock_len; /* the size of that address */
+    struct sockaddr address; /* the destination address */
+    socklen_t sock_len; /* the size of the destination address */
 
 } state_t;
 
