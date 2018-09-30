@@ -52,7 +52,9 @@ int main(int argc, char *argv[]){
 	printf("File address\n");
 
 	while ((numRead = fread(buf, 1, DATALEN * N, inputFile)) > 0){
-		printf("numRead: %d, datalen: %d\n", numRead, DATALEN * N);
+
+		printf("numRead: %d, datalen: %d, buffer: %s\n", numRead, DATALEN * N, buf);
+
 		if (gbn_send(sockfd, buf, numRead, 0) == -1){
 			perror("gbn_send");
 			exit(-1);

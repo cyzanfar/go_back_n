@@ -52,20 +52,27 @@ int main(int argc, char *argv[])
 
 	/*----- Waiting for the client to connect -----*/
 	socklen = sizeof(struct sockaddr_in);
-	newSockfd = gbn_accept(sockfd, (struct sockaddr *)&client, &socklen);
-	if (newSockfd == -1){
+
+
+	if ((newSockfd = gbn_accept(sockfd, (struct sockaddr *)&client, &socklen)) == -1){
 		perror("gbn_accept");
 		exit(-1);
 	}
-	
+
+
 	/*----- Reading from the socket and dumping it to the file -----*/
 	while(1){
+        printf("newSockfd: %d\n", newSockfd);
 		if ((numRead = gbn_recv(newSockfd, buf, DATALEN, 0)) == -1){
 			perror("gbn_recv");
 			exit(-1);
 		}
-		else if (numRead == 0)
-			break;
+		else if (numRead == 0) {
+            printf("breaking...\n");
+            break;
+		}
+
+		printf("About to write...\n");
 		fwrite(buf, 1, numRead, outputFile);
 	}
 

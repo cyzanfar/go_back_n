@@ -14,6 +14,7 @@
 #include<errno.h>
 #include<netdb.h>
 #include<time.h>
+#include<assert.h>
 
 /*----- Error variables -----*/
 extern int h_errno;

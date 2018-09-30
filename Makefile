@@ -24,7 +24,7 @@ CC              = gcc
 LD              = gcc
 AR              = ar
 
-CFLAGS          = -Wall -ansi 
+CFLAGS          = -Wall -ansi
 LFLAGS          = -Wall -ansi
 
 SENDEROBJS		= sender.o gbn.o
