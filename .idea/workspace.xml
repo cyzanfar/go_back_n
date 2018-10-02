@@ -12,7 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2df901e3-ab6e-4f0b-bd2b-0231791e1828" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gbn.c" beforeDir="false" afterPath="$PROJECT_DIR$/gbn.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gbn.h" beforeDir="false" afterPath="$PROJECT_DIR$/gbn.h" afterDir="false" />
     </list>
@@ -108,15 +107,15 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="c" value="8974" />
-          <entry key="h" value="158" />
+          <entry key="c" value="10314" />
+          <entry key="h" value="219" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CMakeLists.txt" value="9" />
-          <entry key="ObjectiveC" value="9132" />
+          <entry key="ObjectiveC" value="10533" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.cidr.testingFrameworks.usages" />
@@ -128,8 +127,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sender.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+            <state relative-caret-position="347">
+              <caret line="60" column="9" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -137,8 +136,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gbn.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="145">
-              <caret line="43" selection-start-line="43" selection-end-line="46" selection-end-column="27" />
+            <state relative-caret-position="382">
+              <caret line="43" column="17" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="17" />
               <folding>
                 <element signature="e#31#52#0" expanded="true" />
               </folding>
@@ -149,8 +148,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gbn.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+            <state relative-caret-position="384">
+              <caret line="186" column="16" selection-start-line="186" selection-start-column="16" selection-end-line="186" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -168,17 +167,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Buffer content</find>
-      <find>gbn_recv</find>
-      <find>length:</find>
-      <find>printf(&quot;DATA packet size: %d\n&quot;, sizeof(DATA_packet));</find>
-      <find>printf(&quot;DATA packet size: %d\n&quot;</find>
-      <find>printf(&quot;length: %d\n&quot;,len);</find>
-      <find>ACCEPT</find>
       <find>Byte length upon receive</find>
       <find>s.sock_len = socklen</find>
       <find>In</find>
-      <find>s.curr_state =</find>
       <find>numRead:</find>
       <find>s.address</find>
       <find>address</find>
@@ -189,15 +180,23 @@
       <find>packet_checksum</find>
       <find>checksu</find>
       <find>checksum(</find>
-      <find>accept</find>
       <find>Packet received with byte_count</find>
       <find>checksum</find>
       <find>accepr</find>
-      <find>connect</find>
-      <find>connect(</find>
       <find>s.seq_num =</find>
       <find>s.address</find>
       <find>validate_packet</find>
+      <find>gbn_close</find>
+      <find>s.curr_state =</find>
+      <find>s.curr_state = CLOSED</find>
+      <find>CONNECT(</find>
+      <find>timeout_hdler</find>
+      <find>Data packet send error</find>
+      <find>accept(</find>
+      <find>connect(</find>
+      <find>gbn</find>
+      <find>connect</find>
+      <find>accept</find>
     </findStrings>
     <dirStrings>
       <dir>receiver.c.o</dir>
@@ -215,8 +214,8 @@
         <option value="$PROJECT_DIR$/sender.c" />
         <option value="$PROJECT_DIR$/Makefile" />
         <option value="$PROJECT_DIR$/receiver.c" />
-        <option value="$PROJECT_DIR$/gbn.c" />
         <option value="$PROJECT_DIR$/gbn.h" />
+        <option value="$PROJECT_DIR$/gbn.c" />
       </list>
     </option>
   </component>
@@ -306,7 +305,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="75280000" />
+    <option name="totallyTimeSpent" value="86923000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -466,13 +465,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sender.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/receiver.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="294">
@@ -480,10 +472,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sender.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="60" column="9" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gbn.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="43" selection-start-line="43" selection-end-line="46" selection-end-column="27" />
+        <state relative-caret-position="382">
+          <caret line="43" column="17" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="17" />
           <folding>
             <element signature="e#31#52#0" expanded="true" />
           </folding>
@@ -492,8 +491,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gbn.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+        <state relative-caret-position="384">
+          <caret line="186" column="16" selection-start-line="186" selection-start-column="16" selection-end-line="186" selection-end-column="16" />
         </state>
       </provider>
     </entry>

@@ -85,7 +85,10 @@ uint16_t checksum(uint16_t *buf, int nwords);
 
 uint8_t validate_packet(gbnhdr *packet);
 
-#define h_addr h_addr_list[0] /* for backward compatibility */
+void timeout_hdler(int);
 
+
+#define h_addr h_addr_list[0] /* for backward compatibility */
+#define MAX_ATTEMPTS 5
 
 #endif

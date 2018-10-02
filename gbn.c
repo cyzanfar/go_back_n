@@ -53,7 +53,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
 
         printf("Waiting for DATAACK packet...\n");
-        if (recvfrom(sockfd,DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
+        if (recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
             perror("Data ack packet recv error");
             exit(-1);
         }
@@ -116,7 +116,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
 
 int gbn_close(int sockfd){
 
-    /* TODO: Your code here. */
+
 
     return(-1);
 }
@@ -125,9 +125,9 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
     printf("In Connect() with socket: %d, server: %d, socklen: %d\n", sockfd, server->sa_family, socklen);
 
+    /* create the SYN packet and populate it */
     gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
     memset(SYN_packet->data, 0, sizeof(SYN_packet->data));
-
     SYN_packet->type = SYN;
     SYN_packet->seqnum = s.seq_num;
 
@@ -137,42 +137,70 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
     gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
     memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
 
-    if (s.curr_state == CLOSED) {
+    /* counter that will handle when the close the connection on timeout/fail */
+    int attempts = 0;
 
-        printf("Sending SYN_packet with seqnum: %d...\n", SYN_packet->seqnum);
+    while(1) {
 
-        if (sendto(sockfd, SYN_packet, sizeof(SYN_packet), 0, server, socklen) == -1) {
-            perror("Sendto error");
+        if (attempts > MAX_ATTEMPTS) {
+            printf("\nMax attempt exceeded, exiting program...\n");
+            s.curr_state = CLOSED;
+
+            free(SYN_packet);
+            free(SYNACK_packet);
+            /* we assume connection is failing so we shut down */
             exit(-1);
         }
 
-        s.curr_state = SYN_SENT;
+        if (s.curr_state == CLOSED) {
 
-        printf("Current state SYN_SENT: %d\n", s.curr_state);
-    }
+            printf("Sending SYN_packet with seqnum: %d...\n", SYN_packet->seqnum);
 
-    if (s.curr_state == SYN_SENT) {
+            if (sendto(sockfd, SYN_packet, sizeof(SYN_packet), 0, server, socklen) == -1) {
+                perror("Sendto error");
+                exit(-1);
+            }
 
-        printf("Waiting for SYNACK_packet...\n");
+            s.curr_state = SYN_SENT;
 
-        if(recvfrom(sockfd, SYNACK_packet, sizeof(*SYNACK_packet), 0, (struct sockaddr *)&server, &socklen) == -1) {
-            perror("Recvfrom SYNACK_packet error");
-            exit(-1);
+            printf("Current state SYN_SENT: %d\n", s.curr_state);
         }
 
-        if ((SYNACK_packet->type == SYNACK) && (validate_packet(SYNACK_packet) == 1)) {
+        if (s.curr_state == SYN_SENT) {
 
-            printf("SYNACK_packet received\n");
+            alarm(1);
+            attempts++;
+            printf("\nAttempt number: %d \nWaiting for SYNACK_packet...\n", attempts);
 
-            s.address = *(struct sockaddr *)&server;
-            s.sock_len = socklen;
-            s.curr_state = ESTABLISHED;
-            s.seq_num = SYNACK_packet->seqnum;
-            printf("Current state ESTABLISHED: %d\n", s.curr_state);
+            if (recvfrom(
+                    sockfd, SYNACK_packet, sizeof(*SYNACK_packet), 0, (struct sockaddr *) &server, &socklen) == -1)
+            {
+                if (errno != EINTR) {
+                    perror("Recvfrom SYNACK_packet error\n");
+                    s.curr_state = CLOSED;
+                    exit(-1);
+                }
+            }
+
+            if ((SYNACK_packet->type == SYNACK) && (validate_packet(SYNACK_packet) == 1)) {
+
+                alarm(0);
+                printf("SYNACK_packet received\n");
+
+                s.address = *(struct sockaddr *) &server;
+                s.sock_len = socklen;
+                s.curr_state = ESTABLISHED;
+                s.seq_num = SYNACK_packet->seqnum;
+                printf("Current state ESTABLISHED: %d\n", s.curr_state);
+
+                free(SYN_packet);
+                free(SYNACK_packet);
+
+                return sockfd;
+
+            }
         }
-
     }
-    return sockfd;
 }
 
 int gbn_listen(int sockfd, int backlog){
@@ -217,6 +245,9 @@ int gbn_socket(int domain, int type, int protocol){
     /* Set the size to 1. This state will be modified according to the go-back-n protocol */
     s.window_size = 1;
 
+    /* declate signal for setting alarm */
+    signal(SIGALRM, timeout_hdler);
+
     printf("Seq num: %d, Window size: %d\n", s.seq_num, s.window_size);
 
     int sockfd = socket(domain, type, protocol);
@@ -233,7 +264,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
 
     /* init SYN_packet to be populated */
     gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
-    memset(SYN_packet->data, 0, sizeof(SYN_packet->data));
+    memset(SYN_packet->data, '\0', sizeof(SYN_packet->data));
 
     /* init the SYNACK packet to be sent after the SYN packet */
     gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
@@ -243,56 +274,72 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
     /* number of bytes received */
     ssize_t byte_count;
 
-    if (s.curr_state == CLOSED) {
+    int attempts = 0;
 
-        printf("Waiting for SYN_packet...\n");
+    while(1) {
 
-        /* Waiting for a SYN packet to establish connection */
-
-        if ((byte_count = recvfrom(sockfd, SYN_packet, sizeof(*SYN_packet), 0, client, socklen) == -1)) {
-            perror("SYN receive error");
+        if (attempts > MAX_ATTEMPTS) {
+            printf("\nMax attempt exceeded, exiting program...\n");
+            s.curr_state = CLOSED;
             exit(-1);
         }
 
-        printf("Packet received with byte_count: %d, SYN type: %d\n", (int)byte_count, SYN_packet->type);
-    }
+        if (s.curr_state == CLOSED) {
 
+            /* Waiting for a SYN packet to establish connection */
 
-    if ((SYN_packet->type == SYN) && (validate_packet(SYN_packet) == 1)) {
-        printf("Packet is SYN_packet\n");
+            alarm(1);
+            attempts++;
+            printf("Attempt number: %d\n Waiting for SYN_packet...\n", attempts);
 
-        s.curr_state = SYN_RCVD;
-        s.seq_num = SYN_packet->seqnum + sizeof(*SYN_packet);
+            if ((byte_count = recvfrom(sockfd, SYN_packet, sizeof(*SYN_packet), 0, client, socklen) == -1)) {
 
-        SYNACK_packet->seqnum = s.seq_num;
+                if (errno != EINTR) {
+                    perror("SYN receive error\n");
+                    s.curr_state = CLOSED;
+                    exit(-1);
+                }
+            }
 
-        SYNACK_packet->checksum = checksum((uint16_t *)SYNACK_packet, sizeof(*SYNACK_packet) / sizeof(uint16_t));
-
-        printf("Current state SYN_RCVD: %d\n Sending SYNACK_packet...\n with seqnum: %d, checksum: %d\n",
-                s.curr_state,
-                SYNACK_packet->seqnum,
-                SYNACK_packet->checksum);
-
-        if (sendto(sockfd, SYNACK_packet, sizeof(*SYNACK_packet), 0, client, *socklen) == -1) {
-            perror("SYNACK send error");
-            exit(-1); /* TODO retry sending SYNACK */
+            printf("\nPacket received with byte_count: %d, SYN type: %d\n", (int)byte_count, SYN_packet->type);
         }
 
-        s.curr_state = ESTABLISHED;
-        s.address = *client;
-        s.sock_len = *socklen;
 
-        printf("Current state ESTABLISHED: %d\n", s.curr_state);
+        if ((SYN_packet->type == SYN) && (validate_packet(SYN_packet) == 1)) {
 
-        free(SYN_packet);
-        free(SYNACK_packet);
-    }
+            /* reseting the alarm to zero (no alarm) for further use */
+            alarm(0);
 
-    if (s.curr_state == ESTABLISHED) {
-        return sockfd;
-    } else {
-        printf("return -1");
-        return(-1);
+            printf("Packet is SYN_packet\n");
+
+            s.curr_state = SYN_RCVD;
+            s.seq_num = SYN_packet->seqnum + sizeof(*SYN_packet);
+
+            SYNACK_packet->seqnum = s.seq_num;
+
+            SYNACK_packet->checksum = checksum((uint16_t *)SYNACK_packet, sizeof(*SYNACK_packet) / sizeof(uint16_t));
+
+            printf("Current state SYN_RCVD: %d\n Sending SYNACK_packet...\n with seqnum: %d, checksum: %d\n",
+                   s.curr_state,
+                   SYNACK_packet->seqnum,
+                   SYNACK_packet->checksum);
+
+            if (sendto(sockfd, SYNACK_packet, sizeof(*SYNACK_packet), 0, client, *socklen) == -1) {
+                perror("SYNACK send error\n");
+                exit(-1); /* TODO retry sending SYNACK */
+            }
+
+            s.curr_state = ESTABLISHED;
+            s.address = *client;
+            s.sock_len = *socklen;
+
+            printf("Current state ESTABLISHED: %d\n", s.curr_state);
+
+            free(SYN_packet);
+            free(SYNACK_packet);
+
+            return sockfd;
+        }
     }
 }
 
@@ -308,6 +355,13 @@ uint8_t validate_packet(gbnhdr *packet){
     }
     printf("CHECKSUM FAILED: %d != %d",packet_checksum, received_checksum);
     return 0;
+}
+
+void timeout_hdler(int signum) {
+
+    /* apparently bad practice to printf in signal use flag instead */
+    printf("TIMEOUT has occured with signum: %d", signum);
+    signal(SIGALRM, timeout_hdler);
 }
 
 ssize_t maybe_recvfrom(int  s, char *buf, size_t len, int flags, struct sockaddr *from, socklen_t *fromlen){
