@@ -83,6 +83,9 @@ ssize_t  maybe_recvfrom(int  s, char *buf, size_t len, int flags, \
 
 uint16_t checksum(uint16_t *buf, int nwords);
 
+uint8_t validate_packet(gbnhdr *packet);
+
 #define h_addr h_addr_list[0] /* for backward compatibility */
+
 
 #endif

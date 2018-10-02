@@ -12,14 +12,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2df901e3-ab6e-4f0b-bd2b-0231791e1828" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gbn.c" beforeDir="false" afterPath="$PROJECT_DIR$/gbn.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gbn.h" beforeDir="false" afterPath="$PROJECT_DIR$/gbn.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/receiver.c" beforeDir="false" afterPath="$PROJECT_DIR$/receiver.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sender.c" beforeDir="false" afterPath="$PROJECT_DIR$/sender.c" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -94,7 +89,7 @@
           <entry key="cbp" value="2" />
           <entry key="check_cache" value="1" />
           <entry key="cmake" value="4" />
-          <entry key="h" value="10" />
+          <entry key="h" value="11" />
           <entry key="includecache" value="1" />
           <entry key="internal" value="1" />
           <entry key="log" value="1" />
@@ -107,21 +102,21 @@
         <counts>
           <entry key="CMakeCache.txt" value="1" />
           <entry key="CMakeLists.txt" value="4" />
-          <entry key="ObjectiveC" value="27" />
+          <entry key="ObjectiveC" value="28" />
           <entry key="PLAIN_TEXT" value="19" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="c" value="7815" />
-          <entry key="h" value="108" />
+          <entry key="c" value="8974" />
+          <entry key="h" value="158" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CMakeLists.txt" value="9" />
-          <entry key="ObjectiveC" value="7923" />
+          <entry key="ObjectiveC" value="9132" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.cidr.testingFrameworks.usages" />
@@ -131,10 +126,19 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sender.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="305">
+              <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gbn.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="128">
-              <caret line="57" column="10" lean-forward="true" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
+            <state relative-caret-position="145">
+              <caret line="43" selection-start-line="43" selection-end-line="46" selection-end-column="27" />
               <folding>
                 <element signature="e#31#52#0" expanded="true" />
               </folding>
@@ -142,29 +146,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Makefile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="26" column="18" selection-start-line="26" selection-start-column="18" selection-end-line="26" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sender.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="438">
-              <caret line="64" column="33" lean-forward="true" selection-start-line="64" selection-start-column="33" selection-end-line="64" selection-end-column="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gbn.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="38" column="18" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+            <state relative-caret-position="333">
+              <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
             </state>
           </provider>
         </entry>
@@ -172,8 +158,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/receiver.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="415">
-              <caret line="65" column="20" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="20" />
+            <state relative-caret-position="294">
+              <caret line="75" column="14" selection-start-line="75" selection-start-column="8" selection-end-line="75" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -182,26 +168,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>receiv</find>
-      <find>rec</find>
-      <find>_recv</find>
-      <find>recvfrom</find>
-      <find>In ac</find>
-      <find>accept(</find>
-      <find>gbn_connect</find>
-      <find>gbn_send</find>
-      <find>acc</find>
-      <find>Success</find>
-      <find>acce</find>
-      <find>gbn_accept</find>
-      <find>newSockfd</find>
-      <find>recv</find>
-      <find>socklen_t</find>
-      <find>gbn_se</find>
-      <find>sendto</find>
-      <find>gbn_conn</find>
-      <find>datalen</find>
-      <find>Connection is established. Waiting for packet</find>
       <find>Buffer content</find>
       <find>gbn_recv</find>
       <find>length:</find>
@@ -211,7 +177,27 @@
       <find>ACCEPT</find>
       <find>Byte length upon receive</find>
       <find>s.sock_len = socklen</find>
+      <find>In</find>
+      <find>s.curr_state =</find>
+      <find>numRead:</find>
+      <find>s.address</find>
       <find>address</find>
+      <find>gbn_send</find>
+      <find>SYNACK_packet</find>
+      <find>accep</find>
+      <find>connecT(</find>
+      <find>packet_checksum</find>
+      <find>checksu</find>
+      <find>checksum(</find>
+      <find>accept</find>
+      <find>Packet received with byte_count</find>
+      <find>checksum</find>
+      <find>accepr</find>
+      <find>connect</find>
+      <find>connect(</find>
+      <find>s.seq_num =</find>
+      <find>s.address</find>
+      <find>validate_packet</find>
     </findStrings>
     <dirStrings>
       <dir>receiver.c.o</dir>
@@ -228,9 +214,9 @@
         <option value="$PROJECT_DIR$/test.txt" />
         <option value="$PROJECT_DIR$/sender.c" />
         <option value="$PROJECT_DIR$/Makefile" />
-        <option value="$PROJECT_DIR$/gbn.h" />
         <option value="$PROJECT_DIR$/receiver.c" />
         <option value="$PROJECT_DIR$/gbn.c" />
+        <option value="$PROJECT_DIR$/gbn.h" />
       </list>
     </option>
   </component>
@@ -240,6 +226,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="OCFindUsagesOptions" text="false" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1280" />
@@ -319,7 +306,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="53496000" />
+    <option name="totallyTimeSpent" value="75280000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -334,6 +321,30 @@
     <frame x="0" y="23" width="1280" height="777" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info content_ui="combo" id="Project" order="0" weight="0.09450727" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="File Transfer" order="0" weight="0.329927" />
+      <window_info anchor="bottom" id="Message" order="1" />
+      <window_info anchor="bottom" id="Messages" order="2" weight="0.329927" />
+      <window_info anchor="bottom" id="Find" order="3" weight="0.329927" />
+      <window_info anchor="bottom" id="Run" order="4" />
+      <window_info anchor="bottom" id="Debug" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="6" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="8" weight="0.329927" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.4189781" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="CMake" order="13" />
+      <window_info anchor="right" id="Remote Host" order="0" weight="0.32956383" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="1" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
+      <window_info anchor="right" id="Database" order="4" weight="0.32956383" />
+    </layout>
+    <layout-to-restore>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09450727" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -347,7 +358,7 @@
       <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="8" weight="0.329927" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.4189781" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
       <window_info anchor="bottom" id="CMake" order="13" />
@@ -356,7 +367,7 @@
       <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
       <window_info anchor="right" id="Database" order="4" weight="0.32956383" />
-    </layout>
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -457,22 +468,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sender.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="438">
-          <caret line="64" column="33" lean-forward="true" selection-start-line="64" selection-start-column="33" selection-end-line="64" selection-end-column="33" />
+        <state relative-caret-position="305">
+          <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/receiver.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="65" column="20" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="20" />
+        <state relative-caret-position="294">
+          <caret line="75" column="14" selection-start-line="75" selection-start-column="8" selection-end-line="75" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gbn.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="57" column="10" lean-forward="true" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
+        <state relative-caret-position="145">
+          <caret line="43" selection-start-line="43" selection-end-line="46" selection-end-column="27" />
           <folding>
             <element signature="e#31#52#0" expanded="true" />
           </folding>
@@ -481,8 +492,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gbn.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="38" column="18" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+        <state relative-caret-position="333">
+          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
         </state>
       </provider>
     </entry>
