@@ -89,6 +89,8 @@ uint16_t checksum(uint16_t *buf, int nwords);
 
 uint8_t validate_packet(gbnhdr *packet);
 
+gbnhdr *create_rcv_pkt();
+
 void timeout_hdler(int);
 
 

@@ -138,9 +138,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
     int i;
     for (i = 0; i < num_packets; i++) {
 
-        gbnhdr *DATAACK_packet_x = malloc(sizeof(*DATAACK_packet_x));
-        memset(DATAACK_packet_x->data, 0, sizeof(DATAACK_packet_x->data));
-
+        gbnhdr *DATAACK_packet_x = create_ack_pkt();
         printf("Sending packet num %d...\n", i);
 
         if (sendto(sockfd, pkt_buffer[i], sizeof(*pkt_buffer[i]), flags, &s.address, s.sock_len) == -1) {
@@ -172,8 +170,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
     printf("In gbn_recv()\n");
 
     /*------- create the data and data ack used to receive and respond to incoming packet -------*/
-    gbnhdr *DATA_packet = malloc(sizeof(*DATA_packet));
-    memset(DATA_packet->data, 0, sizeof(DATA_packet->data));
+    gbnhdr *DATA_packet = create_ack_pkt();
 
     gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
     memset(DATAACK_packet->data, 0, sizeof(DATAACK_packet->data));
@@ -259,8 +256,8 @@ int gbn_close(int sockfd){
     memset(FIN_packet->data, 0, sizeof(FIN_packet->data));
     FIN_packet->type = FIN;
 
-    gbnhdr *FINACK_packet = malloc(sizeof(*FINACK_packet));
-    memset(FINACK_packet->data, 0, sizeof(FINACK_packet->data));
+    gbnhdr *FINACK_packet = create_ack_pkt();
+
     /*--------- END FIN/FINACK packet creation ---------*/
 
     if (s.curr_state == FIN_RCVD) {
@@ -326,11 +323,12 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
     SYN_packet->checksum = 0;
     SYN_packet->checksum = checksum((uint16_t  *)SYN_packet, sizeof(*SYN_packet) / sizeof(uint16_t));
 
+
+
     printf("gbn_connect SYN_PACKET checksum: %d\n",  SYN_packet->checksum ) ;
 
-    /* init the SYNACK packet to be sent */
-    gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
-    memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
+    gbnhdr *SYNACK_packet = create_ack_pkt(); /* init the SYNACK packet to be sent */
+
 
     /* counter that will handle when the close the connection on timeout/fail */
     int attempts = 0;
@@ -343,7 +341,6 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
             free(SYN_packet);
             free(SYNACK_packet);
-            /* we assume connection is failing so we shut down */
             return(-1);
         }
 
@@ -460,8 +457,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
     printf("Current state: %d\n", s.curr_state);
 
     /* init SYN_packet to be populated */
-    gbnhdr *SYN_packet = malloc(sizeof(*SYN_packet));
-    memset(SYN_packet->data, '\0', sizeof(SYN_packet->data));
+    gbnhdr *SYN_packet = create_rcv_pkt();
 
     /* init the SYNACK packet to be sent after the SYN packet */
     gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
@@ -568,6 +564,13 @@ void timeout_hdler(int signum) {
 
     /* TODO is this safe? race condition? */
     signal(SIGALRM, timeout_hdler);
+}
+
+gbnhdr *create_rcv_pkt() {
+    gbnhdr *packet = malloc(sizeof(*packet));
+    memset(packet, 0, sizeof(packet));
+
+    return packet;
 }
 
 ssize_t maybe_recvfrom(int  s, char *buf, size_t len, int flags, struct sockaddr *from, socklen_t *fromlen){
