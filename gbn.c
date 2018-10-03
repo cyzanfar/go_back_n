@@ -21,7 +21,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
     socklen_t server_len = sizeof(server);
 
     printf("In Send() buf len: %d, flags: %d\n", (int)len, flags);
-    printf("Data length: %d\n", len);
+    printf("Data length: %d\n", (int)len);
 
     int data_offset = 0; /* Input buffer location pointer */
 
@@ -46,7 +46,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
             gbnhdr *DATA_packet = malloc(sizeof(*DATA_packet));
 
             /* Call create_DATA_packet to complete packet creation */
-            create_DATA_packet(DATA_packet, s.seq_num+data_offset, buf+data_offset, DATALEN);
+            create_DATA_packet(DATA_packet, s.seq_num+data_offset, buf+data_offset, DATALEN, DATA);
 
             printf("gbn_send DATA_packet checksum: %d\nDATA packet content: %s\n",
                     DATA_packet->checksum,  DATA_packet->data);
@@ -71,7 +71,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
         gbnhdr *DATA_packet = malloc(sizeof(*DATA_packet));
 
         /* Create (last) DATA_packet using create_DATA_packet function */
-        create_DATA_packet(DATA_packet, s.seq_num+data_offset, buf+data_offset, curr_len);
+        create_DATA_packet(DATA_packet, s.seq_num+data_offset, buf+data_offset, curr_len, DATA);
 
         printf("gbn_send DATA_packet checksum: %d\nDATA packet content: %s\n",
                 DATA_packet->checksum,  DATA_packet->data);
@@ -133,7 +133,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
                 printf("Last packet actual length: %d\n", pkt_buffer[confirmed_pkts]->actual_len);
 
-                if (maybe_recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, \
+                if (maybe_recvfrom(sockfd, (char *)DATAACK_packet, sizeof(*DATAACK_packet), flags, \
                                    &server, &server_len) == -1) {
 
                     perror("Data ack packet recv error");
@@ -206,7 +206,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
         int cur_pkt;
         for (cur_pkt = 0; cur_pkt < num_packets; cur_pkt++) {
 
-            /* Set current state seq_num to cur_pkt seqnum
+            Set current state seq_num to cur_pkt seqnum
             s.seq_num = pkt_buffer[cur_pkt]->seqnum;
 
             gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
@@ -241,7 +241,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
             printf("DATAACK_packet received...\n");
 
-            /* set to null
+            set to null
             free(pkt_buffer[cur_pkt]);
             free(DATAACK_packet);
 
@@ -261,13 +261,13 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
     gbnhdr *DATA_packet = create_rcv_pkt();
 
     gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
-    memset(DATAACK_packet->data, 0, sizeof(DATAACK_packet->data));
+    memset(DATAACK_packet, 0, sizeof(*DATAACK_packet));
     DATAACK_packet->type = DATAACK;
     /* ------------------------------------------------------------------------------------------*/
 
     /* When the sender is done transmitting data will attempt to close by sending FIN, respond with FINACK */
     gbnhdr *FINACK_packet = malloc(sizeof(*FINACK_packet));
-    memset(FINACK_packet->data, 0, sizeof(FINACK_packet->data));
+    memset(FINACK_packet, 0, sizeof(*FINACK_packet));
     FINACK_packet->type = FINACK;
 
     /* Variable declaration to be populated from peer client */
@@ -300,7 +300,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
             DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
             s.seq_num = DATA_packet->seqnum + DATA_packet->actual_len + 1;
 
-            printf("Data packet content: %s\n Buffer content: %s\n", DATA_packet->data, buf);
+            printf("Data packet content: %s\n Buffer content: %s\n", DATA_packet->data, (char *)buf);
             printf("Data packet data length: %d\n", DATA_packet->actual_len);
             printf("DATA_packet received.\n Sending DATAACK_packet with seqnum %d...\n", DATAACK_packet->seqnum);
 
@@ -668,22 +668,23 @@ uint8_t validate_packet(gbnhdr *packet){
     return(-1);
 }
 
-void create_DATA_packet(gbnhdr *DATA_packet, uint32_t pkt_seqnum, const void *buf_pointer, size_t data_len){
+void create_DATA_packet(gbnhdr *DATA_packet, uint32_t pkt_seqnum, \
+        const void *buf_pointer, size_t data_len, int data_type) {
 
-    printf("Received data length: %d\n", data_len);
+    printf("Received data length: %d\n", (int)data_len);
 
     memset(DATA_packet->data, 0, sizeof(DATA_packet->data));
     DATA_packet->type = DATA;
     DATA_packet->seqnum = pkt_seqnum;
     DATA_packet->checksum = 0;
     DATA_packet->actual_len = data_len;
-
-    printf("Packet seq number %d\n", DATA_packet->seqnum);
-    printf("Packet data length: %d\n", DATA_packet->actual_len);
-
-    printf("Adding data to packet %d\n", DATA_packet->seqnum);
     memcpy(DATA_packet->data, buf_pointer, data_len);
-    printf("Packet data in create_packet_func: %s\n", DATA_packet->data);
+
+    printf("Packet seq number %d\n Packet data length: %d\n",
+            DATA_packet->seqnum, DATA_packet->actual_len);
+
+    printf("Adding data to packet %d\n Packet data in create_packet_func: %s\n",
+            DATA_packet->seqnum, DATA_packet->data);
 
     DATA_packet->checksum = checksum((uint16_t  *)DATA_packet, sizeof(*DATA_packet) / sizeof(uint16_t));
 
@@ -700,7 +701,7 @@ void timeout_hdler(int signum) {
 
 gbnhdr *create_rcv_pkt() {
     gbnhdr *packet = malloc(sizeof(*packet));
-    memset(packet, 0, sizeof(packet));
+    memset(packet, 0, sizeof(*packet));
 
     return packet;
 }
