@@ -90,12 +90,14 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
         }
 
         printf("Data packet size: %d\n Byte length upon receive: %d\n",
-        (int)sizeof(DATA_packet),
+        sizeof(*DATA_packet),
         (unsigned int)byte_length);
 
-        if (DATA_packet->type == DATA) {
+        if (DATA_packet->type == DATA && validate_packet(DATA_packet)) {
 
             memcpy(buf, DATA_packet->data, byte_length);
+            DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
+            DATAACK_packet->seqnum = DATA_packet->seqnum + sizeof(DATA_packet->data) + 1;
 
             printf("Data packet content: %s\n Buffer content: %s\n", DATA_packet->data, buf);
 
@@ -116,8 +118,56 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
 
 int gbn_close(int sockfd){
 
+    /*--------- for sending FIN and receiving FINACK ---------*/
+    gbnhdr *FIN_packet = malloc(sizeof(*FIN_packet));
+    memset(FIN_packet->data, 0, sizeof(FIN_packet->data));
+    FIN_packet->type = FIN;
 
+    gbnhdr *FINACK_packet = malloc(sizeof(*FINACK_packet));
+    memset(FINACK_packet->data, 0, sizeof(FINACK_packet->data));
+    /*--------- END FIN/FINACK packet creation ---------*/
 
+    int attempts = 0;
+    while (s.curr_state != CLOSED) {
+
+        if (attempts > MAX_ATTEMPTS) {
+            printf("MAX attempts reached, exiting program...\n");
+            free(FIN_packet);
+            free(FINACK_packet);
+            exit(-1);
+
+        }
+
+        printf("Sending FIN_packet...\n");
+
+        if (sendto(sockfd, FIN_packet, sizeof(*FIN_packet), 0, &s.address, s.sock_len) == -1) {
+            perror("close FIN_packet error\n");
+            s.curr_state = CLOSED;
+            exit(-1);
+        }
+
+        if (FIN_packet->type == FIN && validate_packet(FIN_packet)) {
+            printf("FIN_packet received.\n Sending FINACK_packet...\n");
+
+            alarm(TIMEOUT);
+            attempts++;
+            printf("Attempt number: %d\n", attempts);
+
+            if (recvfrom(sockfd, FINACK_packet, sizeof(*FINACK_packet), 0, &s.address, &s.sock_len) == -1) {
+                if (errno != EINTR) {
+                    perror("close FINACK_packet error\n");
+                    s.curr_state = CLOSED;
+                    exit(-1);
+                }
+            } else {
+                s.curr_state = CLOSED;
+            }
+
+        }
+
+    }
+    free(FIN_packet);
+    free(FINACK_packet);
     return(-1);
 }
 
@@ -156,7 +206,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
             printf("Sending SYN_packet with seqnum: %d...\n", SYN_packet->seqnum);
 
-            if (sendto(sockfd, SYN_packet, sizeof(SYN_packet), 0, server, socklen) == -1) {
+            if (sendto(sockfd, SYN_packet, sizeof(*SYN_packet), 0, server, socklen) == -1) {
                 perror("Sendto error");
                 exit(-1);
             }
@@ -168,7 +218,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
         if (s.curr_state == SYN_SENT) {
 
-            alarm(1);
+            alarm(TIMEOUT);
             attempts++;
             printf("\nAttempt number: %d \nWaiting for SYNACK_packet...\n", attempts);
 
@@ -183,6 +233,8 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
             }
 
             if ((SYNACK_packet->type == SYNACK) && (validate_packet(SYNACK_packet) == 1)) {
+
+                /* resetting the alarm to no alarm */
 
                 alarm(0);
                 printf("SYNACK_packet received\n");
@@ -281,6 +333,10 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
         if (attempts > MAX_ATTEMPTS) {
             printf("\nMax attempt exceeded, exiting program...\n");
             s.curr_state = CLOSED;
+
+            free(SYN_packet);
+            free(SYNACK_packet);
+
             exit(-1);
         }
 
@@ -288,7 +344,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
 
             /* Waiting for a SYN packet to establish connection */
 
-            alarm(1);
+            alarm(TIMEOUT);
             attempts++;
             printf("Attempt number: %d\n Waiting for SYN_packet...\n", attempts);
 
@@ -360,7 +416,9 @@ uint8_t validate_packet(gbnhdr *packet){
 void timeout_hdler(int signum) {
 
     /* apparently bad practice to printf in signal use flag instead */
-    printf("TIMEOUT has occured with signum: %d", signum);
+    printf("\nTIMEOUT has occured with signum: %d\n", signum);
+
+    /* TODO is this safe? race condition? */
     signal(SIGALRM, timeout_hdler);
 }
 

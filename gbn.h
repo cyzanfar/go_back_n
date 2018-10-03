@@ -37,7 +37,10 @@ extern int errno;
 #define FINACK   5        /* Acknowledgement of the FIN packet           */
 #define RST      6        /* Reset packet used to reject new connections */
 
-#define BACKLOG 1
+/*---- Actionable variables ----*/
+#define MAX_ATTEMPTS 5
+#define BACKLOG      1
+#define TIMEOUT      1
 
 /*----- Go-Back-n packet format -----*/
 typedef struct {
@@ -89,6 +92,5 @@ void timeout_hdler(int);
 
 
 #define h_addr h_addr_list[0] /* for backward compatibility */
-#define MAX_ATTEMPTS 5
 
 #endif
