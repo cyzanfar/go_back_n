@@ -146,7 +146,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
         if (sendto(sockfd, pkt_buffer[i], sizeof(*pkt_buffer[i]), flags, &s.address, s.sock_len) == -1) {
             perror("Data packet send error");
-            exit(-1);
+            return(-1);
         }
 
         printf("DATA packet content: %s\nDATA_packet send successfully...\n", DATA_packet_x->data);
@@ -157,7 +157,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
         if (recvfrom(sockfd, DATAACK_packet_x, sizeof(*DATAACK_packet_x), flags, &server, &server_len) == -1) {
             perror("Data ack packet recv error");
-            exit(-1);
+            return(-1);
         }
 
         printf("DATAACK_packet received...\n");
@@ -170,54 +170,85 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 }
 
 ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
-
     printf("In gbn_recv()\n");
 
-    /* create the data and data ack used to receive and respond to incoming packet */
+    /*------- create the data and data ack used to receive and respond to incoming packet -------*/
     gbnhdr *DATA_packet = malloc(sizeof(*DATA_packet));
     memset(DATA_packet->data, 0, sizeof(DATA_packet->data));
 
     gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
     memset(DATAACK_packet->data, 0, sizeof(DATAACK_packet->data));
     DATAACK_packet->type = DATAACK;
+    /* ------------------------------------------------------------------------------------------*/
 
+    /* When the sender is done transmitting data will attempt to close by sending FIN, respond with FINACK */
+    gbnhdr *FINACK_packet = malloc(sizeof(*FINACK_packet));
+    memset(FINACK_packet->data, 0, sizeof(FINACK_packet->data));
+    FINACK_packet->type = FINACK;
+
+    /* Variable declaration to be populated from peer client */
     struct sockaddr client;
     socklen_t client_len = sizeof(client);
 
+    /* Actual number of bytes received from the sender */
     ssize_t byte_length;
 
     while(s.curr_state == ESTABLISHED){
 
-        printf("Connection is established. Waiting for packet...\n");
+        printf("Connection is established. Waiting for DATA packet...\n");
 
         if ((byte_length = recvfrom(sockfd,DATA_packet, sizeof(*DATA_packet), flags, &client, &client_len)) == -1) {
             perror("Data packet recv error");
-            exit(-1);
+            return(-1);
         }
 
         printf("Data packet size: %d\n Byte length upon receive: %d\n",
-        sizeof(*DATA_packet),
-        (unsigned int)byte_length);
+                sizeof(*DATA_packet),
+                (unsigned int)byte_length);
 
         if (DATA_packet->type == DATA && validate_packet(DATA_packet)) {
 
+            /* Copy data received to buffer */
             memcpy(buf, DATA_packet->data, byte_length);
+
+            /* Create DATAACK packet to be sent to peer */
             DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
-            DATAACK_packet->seqnum = DATA_packet->seqnum + sizeof(DATA_packet->data) + 1;
+            DATAACK_packet->seqnum = DATA_packet->seqnum + sizeof(DATA_packet->data);
+            s.seq_num =   DATA_packet->seqnum + sizeof(DATA_packet->data) +1;
 
             printf("Data packet content: %s\n Buffer content: %s\n", DATA_packet->data, buf);
-
-            /* s.curr_state = CLOSED;  just a placeholder */
             printf("DATA_packet received.\n Sending DATAACK_packet...\n");
 
             if(sendto(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &client, client_len) == -1) {
                 perror("DATAACK packet error");
-                exit(-1);
+                return(-1);
             }
         }
-    }
+        if (DATA_packet->type == FIN) {
+            s.curr_state = FIN_RCVD;
 
+            printf("FIN received, responding with FINACK\n");
+
+            if (sendto(sockfd, FINACK_packet, sizeof(*FINACK_packet), flags, &client, client_len) == -1) {
+                perror("FINACK sendto error\n");
+                s.curr_state = CLOSED;
+
+                free(DATA_packet);
+                free(DATAACK_packet);
+                free(FINACK_packet);
+
+                return(-1);
+            }
+
+            printf("FINACK successfully sent, closing connection...\n");
+            /* TODO need to return the buffer now to write it to the file? */
+        }
+    }
     printf("DATA_packet->data length: %d\n", (int)sizeof(DATA_packet->data));
+
+    free(DATA_packet);
+    free(DATAACK_packet);
+    free(FINACK_packet);
 
     return(len);
 }
@@ -236,11 +267,22 @@ int gbn_close(int sockfd){
     int attempts = 0;
     while (s.curr_state != CLOSED) {
 
+        if (s.curr_state == FIN_RCVD) {
+            printf("FIN received, sending FINACK packet...\n");
+
+            if(sendto(sockfd, FINACK_packet, sizeof(*FINACK_packet), 0, &s.address, &s.sock_len) == -1) {
+                perror("FINACK sending error");
+                s.curr_state = CLOSED;
+            }
+            s.curr_state = CLOSED;
+            return(1);
+        }
+
         if (attempts > MAX_ATTEMPTS) {
             printf("MAX attempts reached, exiting program...\n");
             free(FIN_packet);
             free(FINACK_packet);
-            exit(-1);
+            return(-1);
 
         }
 
@@ -249,7 +291,7 @@ int gbn_close(int sockfd){
         if (sendto(sockfd, FIN_packet, sizeof(*FIN_packet), 0, &s.address, s.sock_len) == -1) {
             perror("close FIN_packet error\n");
             s.curr_state = CLOSED;
-            exit(-1);
+            return(-1);
         }
 
         if (FIN_packet->type == FIN && validate_packet(FIN_packet)) {
@@ -263,7 +305,7 @@ int gbn_close(int sockfd){
                 if (errno != EINTR) {
                     perror("close FINACK_packet error\n");
                     s.curr_state = CLOSED;
-                    exit(-1);
+                    return(-1);
                 }
             } else {
                 s.curr_state = CLOSED;
@@ -272,6 +314,7 @@ int gbn_close(int sockfd){
         }
 
     }
+
     free(FIN_packet);
     free(FINACK_packet);
     return(-1);
@@ -289,6 +332,8 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
     SYN_packet->checksum = 0;
     SYN_packet->checksum = checksum((uint16_t  *)SYN_packet, sizeof(*SYN_packet) / sizeof(uint16_t));
 
+    printf("gbn_connect SYN_PACKET checksum: %d\n",  SYN_packet->checksum ) ;
+
     /* init the SYNACK packet to be sent */
     gbnhdr *SYNACK_packet = malloc(sizeof(*SYNACK_packet));
     memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
@@ -305,7 +350,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
             free(SYN_packet);
             free(SYNACK_packet);
             /* we assume connection is failing so we shut down */
-            exit(-1);
+            return(-1);
         }
 
         if (s.curr_state == CLOSED) {
@@ -314,7 +359,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
             if (sendto(sockfd, SYN_packet, sizeof(*SYN_packet), 0, server, socklen) == -1) {
                 perror("Sendto error");
-                exit(-1);
+                return(-1);
             }
 
             s.curr_state = SYN_SENT;
@@ -334,7 +379,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
                 if (errno != EINTR) {
                     perror("Recvfrom SYNACK_packet error\n");
                     s.curr_state = CLOSED;
-                    exit(-1);
+                    return(-1);
                 }
             }
 
@@ -384,7 +429,7 @@ int gbn_bind(int sockfd, const struct sockaddr *server, socklen_t socklen){
 
         perror("Bind error");
 
-        exit(-1);
+        return(-1);
     }
 
     return status;
@@ -429,10 +474,14 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
     memset(SYNACK_packet->data, 0, sizeof(SYNACK_packet->data));
     SYNACK_packet->type = SYNACK;
 
+    gbnhdr *RST_packet = malloc(sizeof(*RST_packet));
+    memset(RST_packet->data, 0, sizeof(RST_packet->data));
+    RST_packet->type = RST;
     /* number of bytes received */
     ssize_t byte_count;
 
     int attempts = 0;
+
 
     while(1) {
 
@@ -443,7 +492,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
             free(SYN_packet);
             free(SYNACK_packet);
 
-            exit(-1);
+            return(-1);
         }
 
         if (s.curr_state == CLOSED) {
@@ -459,7 +508,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
                 if (errno != EINTR) {
                     perror("SYN receive error\n");
                     s.curr_state = CLOSED;
-                    exit(-1);
+                    return(-1);
                 }
             }
 
@@ -488,7 +537,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
 
             if (sendto(sockfd, SYNACK_packet, sizeof(*SYNACK_packet), 0, client, *socklen) == -1) {
                 perror("SYNACK send error\n");
-                exit(-1); /* TODO retry sending SYNACK */
+                return(-1); /* TODO retry sending SYNACK */
             }
 
             s.curr_state = ESTABLISHED;
@@ -509,11 +558,10 @@ uint8_t validate_packet(gbnhdr *packet){
     uint16_t received_checksum = packet->checksum;
     packet->checksum = 0;
     uint16_t packet_checksum = checksum((uint16_t  *)packet, sizeof(*packet) / sizeof(uint16_t));
-
-    printf("packet_checksum: %d, and calculated_checksum: %d\n", packet_checksum, received_checksum);
+    printf("packet received checksum: %d, and calculated checksum: %d\n", received_checksum, packet_checksum);
 
     if (packet_checksum == received_checksum) {
-        return 1;
+        return 1
     }
     printf("CHECKSUM FAILED: %d != %d\n",packet_checksum, received_checksum);
     return 0;
