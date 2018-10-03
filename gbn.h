@@ -48,13 +48,13 @@ typedef struct {
     uint32_t  seqnum;          /* sequence number of the packet              */
     uint16_t checksum;        /* header and payload checksum                */
     uint8_t data[DATALEN];    /* pointer to the payload                     */
-    uint8_t actual_len;       /* actual data length in data field           */
+    uint16_t actual_len;       /* actual data length in data field           */
 } __attribute__((packed)) gbnhdr;
 
 typedef struct state_t{
 
     int curr_state; /* ESTABLISHED, CLOSED, etc...*/
-    uint8_t seq_num;  /* the current sequence number */
+    uint32_t seq_num;  /* the current sequence number */
     uint8_t window_size; /* the current window size which should be reset to 1 when congestion */
     struct sockaddr address; /* the destination address */
     socklen_t sock_len; /* the size of the destination address */
@@ -88,6 +88,8 @@ ssize_t  maybe_recvfrom(int  s, char *buf, size_t len, int flags, \
 uint16_t checksum(uint16_t *buf, int nwords);
 
 uint8_t validate_packet(gbnhdr *packet);
+
+void create_DATA_packet(gbnhdr *DATA_packet, uint32_t pkt_seqnum, const void *buf_pointer, size_t data_len);
 
 void timeout_hdler(int);
 
