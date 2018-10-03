@@ -16,7 +16,6 @@ uint16_t checksum(uint16_t *buf, int nwords)
 
 ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
-
     /* Hint: Check the data length field 'len'.
      *       If it is > DATALEN, you will have to split the data
      *       up into multiple packets - you don't have to worry
@@ -209,7 +208,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
         if (DATA_packet->type == DATA && validate_packet(DATA_packet)) {
 
             /* Copy data received to buffer */
-            memcpy(buf, DATA_packet->data, byte_length);
+            memcpy(buf, DATA_packet->data, DATA_packet.);
 
             /* Create DATAACK packet to be sent to peer */
             DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
@@ -242,15 +241,15 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
 
             printf("FINACK successfully sent, closing connection...\n");
             /* TODO need to return the buffer now to write it to the file? */
+            return(0);
         }
+        return(len); /* DO NOT REMOVE */
     }
     printf("DATA_packet->data length: %d\n", (int)sizeof(DATA_packet->data));
 
     free(DATA_packet);
     free(DATAACK_packet);
     free(FINACK_packet);
-
-    return(len);
 }
 
 int gbn_close(int sockfd){
@@ -264,19 +263,13 @@ int gbn_close(int sockfd){
     memset(FINACK_packet->data, 0, sizeof(FINACK_packet->data));
     /*--------- END FIN/FINACK packet creation ---------*/
 
+    if (s.curr_state == FIN_RCVD) {
+        printf("Closing connection from receiver side...\n");
+        s.curr_state = CLOSED;
+        return(1);
+    }
     int attempts = 0;
     while (s.curr_state != CLOSED) {
-
-        if (s.curr_state == FIN_RCVD) {
-            printf("FIN received, sending FINACK packet...\n");
-
-            if(sendto(sockfd, FINACK_packet, sizeof(*FINACK_packet), 0, &s.address, &s.sock_len) == -1) {
-                perror("FINACK sending error");
-                s.curr_state = CLOSED;
-            }
-            s.curr_state = CLOSED;
-            return(1);
-        }
 
         if (attempts > MAX_ATTEMPTS) {
             printf("MAX attempts reached, exiting program...\n");
@@ -294,7 +287,7 @@ int gbn_close(int sockfd){
             return(-1);
         }
 
-        if (FIN_packet->type == FIN && validate_packet(FIN_packet)) {
+        if (FIN_packet->type == FIN) {
             printf("FIN_packet received.\n Sending FINACK_packet...\n");
 
             alarm(TIMEOUT);
@@ -317,7 +310,8 @@ int gbn_close(int sockfd){
 
     free(FIN_packet);
     free(FINACK_packet);
-    return(-1);
+    close(sockfd);
+    return(0);
 }
 
 int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
@@ -561,7 +555,7 @@ uint8_t validate_packet(gbnhdr *packet){
     printf("packet received checksum: %d, and calculated checksum: %d\n", received_checksum, packet_checksum);
 
     if (packet_checksum == received_checksum) {
-        return 1
+        return(1);
     }
     printf("CHECKSUM FAILED: %d != %d\n",packet_checksum, received_checksum);
     return 0;
