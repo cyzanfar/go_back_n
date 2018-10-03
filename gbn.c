@@ -143,12 +143,15 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
                 printf("Last packet actual length: %d\n", pkt_buffer[confirmed_pkts]->actual_len);
 
-                if (recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
+                if (maybe_recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
                     perror("Data ack packet recv error");
                     return(-1);
                 }
 
-                if (DATAACK_packet->type == DATAACK) {
+                if (DATAACK_packet->type == DATAACK && validate_packet(DATAACK_packet)) {
+                    
+                    attempts = 0;
+
                     printf("Expected DATAACK_packet seq_num: %d\n", (s.seq_num+pkt_buffer[confirmed_pkts]->actual_len));
                     printf("DATAACK_packet with seq_num %d received...\n", DATAACK_packet->seqnum);
 
@@ -176,10 +179,23 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
                         printf("Window size changed to %d...\n", s.window_size);
                     }
                     else {
+                        s.window_size = 1;
+
+                        printf("Window size changed to %d...\n", s.window_size);
+
                         printf("Incorrect DATAACK_packet received...\n");
                         attempts++;
                         printf("\nAttempt number: %d\n", attempts);
                     }
+                }
+                else {
+                    s.window_size = 1;
+
+                    printf("Window size changed to %d...\n", s.window_size);
+
+                    printf("Incorrect packet received...\n");
+                    attempts++;
+                    printf("\nAttempt number: %d\n", attempts);
                 }
             }
         }
@@ -287,8 +303,8 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
             memcpy(buf, DATA_packet->data, DATA_packet->actual_len);
 
             /* Create DATAACK packet to be sent to peer */
-            DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
             DATAACK_packet->seqnum = DATA_packet->seqnum + DATA_packet->actual_len;
+            DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
             s.seq_num = DATA_packet->seqnum + DATA_packet->actual_len + 1;
 
             printf("Data packet content: %s\n Buffer content: %s\n", DATA_packet->data, buf);
