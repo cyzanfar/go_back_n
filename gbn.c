@@ -276,11 +276,14 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
 
     /* Actual number of bytes received from the sender */
     ssize_t byte_length;
+    int attempts = 0;
 
     while(s.curr_state == ESTABLISHED){
 
         printf("Connection is established. Waiting for DATA packet...\n");
 
+        alarm(1);
+        attempts++;
         if ((byte_length = recvfrom(sockfd,DATA_packet, sizeof(*DATA_packet), flags, &client, &client_len)) == -1) {
             perror("Data packet recv error");
             return(-1);
