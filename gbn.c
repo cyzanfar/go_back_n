@@ -23,21 +23,25 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
      *       about getting more than N * DATALEN.
      */
     /* create the data and data ack used to receive and respond to incoming packet */
+
+    /*
     gbnhdr *DATA_packet = malloc(sizeof(*DATA_packet));
     memset(DATA_packet->data, 0, sizeof(DATA_packet->data));
     DATA_packet->type = DATA;
+     */
 
+    /*
     gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
     memset(DATAACK_packet->data, 0, sizeof(DATAACK_packet->data));
+    */
 
     struct sockaddr server;
     socklen_t server_len = sizeof(server);
 
-
-
     printf("In Send() buf len: %d, flags: %d\n", (int)len, flags);
-    printf("DATALEN: %d\n", DATALEN);
+    printf("Data length: %d\n", len);
 
+    /*
     if (len < DATALEN) {
 
         memcpy(DATA_packet->data, buf, len);
@@ -49,8 +53,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
             exit(-1);
         }
 
-        printf("DATA packet content: %s\nDATA_packet send successfully...\n", DATA_packet->data);
-
+        printf("DATA packet content: %s\nDATA_packet sent successfully...\n", DATA_packet->data);
 
         printf("Waiting for DATAACK packet...\n");
         if (recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
@@ -58,6 +61,105 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
             exit(-1);
         }
         printf("DATAACK_packet received...\n");
+
+        free(DATA_packet);
+        free(DATAACK_packet);
+
+    }
+
+    else */
+    if (len > DATALEN) {
+        printf("len is greater than DATALEN\n");
+    }
+    /* Make a copy of len */
+    int num_packets = (len/DATALEN);
+    int curr_len = len;
+    printf("curr_len = %d\n", curr_len);
+    gbnhdr *pkt_buffer[num_packets];
+
+    /* int array_counter = 0;*/
+    int in_buf_seqnum = 0;
+    int pkt_buf_counter = 0;
+
+    printf("Creating %d packets\n", num_packets);
+
+    while (curr_len > 1023) {
+
+        printf("Creating packet %d\n", pkt_buf_counter);
+
+        gbnhdr *DATA_packet_x = malloc(sizeof(*DATA_packet_x));
+        memset(DATA_packet_x->data, 0, sizeof(DATA_packet_x->data));
+        DATA_packet_x->type = DATA;
+        DATA_packet_x->seqnum = in_buf_seqnum;
+
+        printf("Packet seq number %d\n", in_buf_seqnum);
+        printf("Adding data to packet %d\n", pkt_buf_counter);
+
+        memcpy(DATA_packet_x->data, buf + in_buf_seqnum, 1023);
+
+        printf("DATA packet content: %s\n", DATA_packet_x->data);
+        printf("Data copied to packet %d\n", pkt_buf_counter);
+
+        pkt_buffer[pkt_buf_counter] = DATA_packet_x;
+
+        printf("Packet %d added to pkt_buffer\n", pkt_buf_counter);
+
+        in_buf_seqnum += 1024;
+        pkt_buf_counter += 1;
+        curr_len -= 1024;
+
+        printf("Remaining length: %d\n", curr_len);
+        printf("len value: %d\n", len);
+
+    }
+
+    printf("Creating last packet, pkt_number %d\n", pkt_buf_counter);
+
+    /* Creating last DATA_packet_x */
+
+    gbnhdr *DATA_packet_x = malloc(sizeof(*DATA_packet_x));
+    memset(DATA_packet_x->data, 0, sizeof(DATA_packet_x->data));
+    DATA_packet_x->type = DATA;
+    DATA_packet_x->seqnum = (in_buf_seqnum);
+
+    /* Copying data to last DATA_packet_x */
+
+    memcpy(DATA_packet_x->data, buf + in_buf_seqnum, curr_len);
+
+    /* Adding last packet to pkt_buffer */
+
+    pkt_buffer[pkt_buf_counter] = DATA_packet_x;
+
+    printf("Sending %d packets\n", num_packets);
+
+    int i;
+    for (i = 0; i < num_packets; i++) {
+
+        gbnhdr *DATAACK_packet_x = malloc(sizeof(*DATAACK_packet_x));
+        memset(DATAACK_packet_x->data, 0, sizeof(DATAACK_packet_x->data));
+
+        printf("Sending packet num %d...\n", i);
+
+        if (sendto(sockfd, pkt_buffer[i], sizeof(*pkt_buffer[i]), flags, &s.address, s.sock_len) == -1) {
+            perror("Data packet send error");
+            exit(-1);
+        }
+
+        printf("DATA packet content: %s\nDATA_packet send successfully...\n", DATA_packet_x->data);
+
+        free(pkt_buffer[i]);
+
+        printf("Waiting for DATAACK packet num %d...\n", i);
+
+        if (recvfrom(sockfd, DATAACK_packet_x, sizeof(*DATAACK_packet_x), flags, &server, &server_len) == -1) {
+            perror("Data ack packet recv error");
+            exit(-1);
+        }
+
+        printf("DATAACK_packet received...\n");
+
+        free(DATAACK_packet_x);
+
     }
 
     return(len);
