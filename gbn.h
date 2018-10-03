@@ -73,6 +73,13 @@ enum {
 extern state_t s;
 
 void gbn_init();
+
+uint8_t validate_packet(gbnhdr *packet);
+gbnhdr *create_rcv_pkt();
+void create_DATA_packet(gbnhdr *DATA_packet, uint32_t pkt_seqnum, \
+            const void *buf_pointer, size_t data_len, int data_type);
+void timeout_hdler(int);
+
 int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen);
 int gbn_listen(int sockfd, int backlog);
 int gbn_bind(int sockfd, const struct sockaddr *server, socklen_t socklen);
@@ -87,11 +94,7 @@ ssize_t  maybe_recvfrom(int  s, char *buf, size_t len, int flags, \
 
 uint16_t checksum(uint16_t *buf, int nwords);
 
-uint8_t validate_packet(gbnhdr *packet);
 
-void create_DATA_packet(gbnhdr *DATA_packet, uint32_t pkt_seqnum, const void *buf_pointer, size_t data_len);
-
-void timeout_hdler(int);
 
 
 #define h_addr h_addr_list[0] /* for backward compatibility */
