@@ -149,7 +149,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
                 }
 
                 if (DATAACK_packet->type == DATAACK && validate_packet(DATAACK_packet)) {
-                    
+
                     attempts = 0;
 
                     printf("Expected DATAACK_packet seq_num: %d\n", (s.seq_num+pkt_buffer[confirmed_pkts]->actual_len));
