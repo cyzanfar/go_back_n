@@ -73,11 +73,11 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
         /* Create (last) DATA_packet using create_DATA_packet function */
         create_DATA_packet(DATA_packet, s.seq_num+data_offset, buf+data_offset, curr_len);
 
-        printf("gbn_send DATA_packet checksum: %d\n", DATA_packet->checksum);
-        printf("DATA packet content: %s\n", DATA_packet->data);
+        printf("gbn_send DATA_packet checksum: %d\nDATA packet content: %s\n",
+                DATA_packet->checksum,  DATA_packet->data);
 
-        /* Add DATA_packet to packet buffer array */
-        pkt_buffer[pkt_buf_counter] = DATA_packet;
+
+        pkt_buffer[pkt_buf_counter] = DATA_packet; /* Add DATA_packet to packet buffer array */
 
         printf("Packet %d added to pkt_buffer\n\n\n", pkt_buf_counter + 1);
 
@@ -339,8 +339,9 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
         free(DATAACK_packet);
         free(FINACK_packet);
 
-        return(DATA_packet->actual_len); /* DO NOT REMOVE BUT MODIFY as desired*/
+        return(DATA_packet->actual_len);
     }
+
     printf("DATA_packet->data length: %d\n", (int)sizeof(DATA_packet->data));
 
     free(DATA_packet);
