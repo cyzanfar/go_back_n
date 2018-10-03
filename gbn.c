@@ -68,6 +68,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
     }
 
     else */
+
     if (len > DATALEN) {
         printf("len is greater than DATALEN\n");
     }
@@ -91,6 +92,9 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
         memset(DATA_packet_x->data, 0, sizeof(DATA_packet_x->data));
         DATA_packet_x->type = DATA;
         DATA_packet_x->seqnum = in_buf_seqnum;
+        DATA_packet_x->checksum = 0;
+        DATA_packet_x->checksum = checksum((uint16_t  *)DATA_packet_x, sizeof(*DATA_packet_x) / sizeof(uint16_t));
+        printf("gbn_send DATA_packet checksum: %d\n", DATA_packet_x->checksum);
 
         printf("Packet seq number %d\n", in_buf_seqnum);
         printf("Adding data to packet %d\n", pkt_buf_counter);
@@ -282,7 +286,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
     memset(SYN_packet->data, 0, sizeof(SYN_packet->data));
     SYN_packet->type = SYN;
     SYN_packet->seqnum = s.seq_num;
-
+    SYN_packet->checksum = 0;
     SYN_packet->checksum = checksum((uint16_t  *)SYN_packet, sizeof(*SYN_packet) / sizeof(uint16_t));
 
     /* init the SYNACK packet to be sent */
@@ -506,12 +510,12 @@ uint8_t validate_packet(gbnhdr *packet){
     packet->checksum = 0;
     uint16_t packet_checksum = checksum((uint16_t  *)packet, sizeof(*packet) / sizeof(uint16_t));
 
-    printf("packet_checksum: %d, and init_checksum: %d\n", packet_checksum, received_checksum);
+    printf("packet_checksum: %d, and calculated_checksum: %d\n", packet_checksum, received_checksum);
 
     if (packet_checksum == received_checksum) {
         return 1;
     }
-    printf("CHECKSUM FAILED: %d != %d",packet_checksum, received_checksum);
+    printf("CHECKSUM FAILED: %d != %d\n",packet_checksum, received_checksum);
     return 0;
 }
 
