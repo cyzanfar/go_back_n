@@ -208,7 +208,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
         if (DATA_packet->type == DATA && validate_packet(DATA_packet)) {
 
             /* Copy data received to buffer */
-            memcpy(buf, DATA_packet->data, DATA_packet.);
+            memcpy(buf, DATA_packet->data, DATA_packet->actual_len);
 
             /* Create DATAACK packet to be sent to peer */
             DATAACK_packet->checksum = checksum((uint16_t  *)DATAACK_packet, sizeof(*DATAACK_packet) / sizeof(uint16_t));
@@ -243,7 +243,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
             /* TODO need to return the buffer now to write it to the file? */
             return(0);
         }
-        return(len); /* DO NOT REMOVE */
+        return(DATA_packet->actual_len); /* DO NOT REMOVE BUT MODIFY as desired*/
     }
     printf("DATA_packet->data length: %d\n", (int)sizeof(DATA_packet->data));
 
