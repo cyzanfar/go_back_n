@@ -133,7 +133,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
                 printf("Last packet actual length: %d\n", pkt_buffer[confirmed_pkts]->actual_len);
 
-                if (recvfrom(sockfd, (char *)DATAACK_packet, sizeof(*DATAACK_packet), flags, \
+                if (maybe_recvfrom(sockfd, (char *)DATAACK_packet, sizeof(*DATAACK_packet), flags, \
                                    &server, &server_len) == -1) {
 
                     perror("Data ack packet recv error");
@@ -292,8 +292,8 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
             return(-1);
         }
 */
-        alarm(1);
-        if ((byte_length = recvfrom(sockfd,DATA_packet, sizeof(*DATA_packet), flags, &client, &client_len)) == -1) {
+        /*alarm(1);*/
+        if ((byte_length = maybe_recvfrom(sockfd,DATA_packet, sizeof(*DATA_packet), flags, &client, &client_len)) == -1) {
             perror("Data packet recv error");
             return(-1);
         }
