@@ -102,52 +102,65 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
             printf("Window size %d...\nConfirmed Packets: %d\n", s.window_size, confirmed_pkts);
 
-            if(attempts > MAX_ATTEMPTS) {
-                printf("MAX attempts reached, exiting program...\n");
-                return(-1);
-            }
-
             int i = 0;
 
-            while ((i < s.window_size) && ((confirmed_pkts+i) < num_packets)) {
+            while ((i < s.window_size) && ((confirmed_pkts + i) < num_packets)) {
 
-                printf("Sending packet num %d...\n", confirmed_pkts+i+1);
+                printf("Sending packet num %d...\n", confirmed_pkts + i + 1);
 
                 if (sendto(sockfd, pkt_buffer[confirmed_pkts + i], sizeof(*pkt_buffer[confirmed_pkts + i]), \
                            flags, &s.address, s.sock_len) == -1) {
 
                     perror("Data packet send error");
-                    return(-1);
+                    return (-1);
                 }
 
                 printf("DATA_packet content: %s\nDATA_packet sent successfully...\n\n",
-                        pkt_buffer[confirmed_pkts+i]->data);
+                       pkt_buffer[confirmed_pkts + i]->data);
 
                 pkts_sent += 1;
                 i++;
             }
 
-            int x;
+            int x = 0;
+            while (x < pkts_sent) {
 
-            for (x = 0; x < pkts_sent; x++){
+                printf("\nAttempt number: %d\n", attempts + 1);
+
+                if (attempts > MAX_ATTEMPTS) {
+                    printf("MAX attempts reached, exiting program...\n");
+                    free(DATAACK_packet);
+                    return (-1);
+                }
 
                 printf("Last packet actual length: %d\n", pkt_buffer[confirmed_pkts]->actual_len);
 
-                if (maybe_recvfrom(sockfd, (char *)DATAACK_packet, sizeof(*DATAACK_packet), flags, \
-                                   &server, &server_len) == -1) {
+                /*alarm(1);*/
+                int rcv_res;
+                rcv_res = recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server,
+                                   &server_len);
 
+                if (rcv_res == -1) {
                     perror("Data ack packet recv error");
-                    return(-1);
+                    if (errno != EINTR) {
+                        continue;
+                    }
+                    return (-1);
                 }
 
-                if (DATAACK_packet->type == DATAACK && validate_packet(DATAACK_packet)) {
+                if (validate_packet(DATAACK_packet) == -1) {
+                    attempts++;
+                    continue;
+                }
 
+                if (DATAACK_packet->type == DATAACK) {
                     attempts = 0;
+                    x++;
 
                     printf("Expected DATAACK_packet seq_num: %d\n DATAACK_packet with seq_num %d received...\n",
-                            (s.seq_num+pkt_buffer[confirmed_pkts]->actual_len), DATAACK_packet->seqnum);
+                           (s.seq_num + pkt_buffer[confirmed_pkts]->actual_len), DATAACK_packet->seqnum);
 
-                    if (DATAACK_packet->seqnum == (s.seq_num+pkt_buffer[confirmed_pkts]->actual_len)) {
+                    if (DATAACK_packet->seqnum == (s.seq_num + pkt_buffer[confirmed_pkts]->actual_len)) {
 
                         printf("Expected DATAACK_packet received...\n");
 
@@ -157,7 +170,7 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
 
                         confirmed_pkts++;
 
-                        switch(s.window_size){
+                        switch (s.window_size) {
                             case 1:
                                 s.window_size = 2;
                                 break;
@@ -171,25 +184,21 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
                         }
 
                         printf("Window size changed to %d...\n", s.window_size);
-                    }
-                    else {
+                    } else {
+
                         s.window_size = 1;
 
                         printf("Window size changed to %d...\n", s.window_size);
 
                         printf("Incorrect DATAACK_packet received...\n");
-                        attempts++;
-                        printf("\nAttempt number: %d\n", attempts + 1);
                     }
-                }
-                else {
+
+                } else {
                     s.window_size = 1;
 
                     printf("Window size changed to %d...\n", s.window_size);
 
-                    printf("Incorrect packet received...\n");
-                    attempts++;
-                    printf("\nAttempt number: %d\n", attempts);
+                    printf("Wrong packet received...\n");
                 }
             }
         }
@@ -201,53 +210,6 @@ ssize_t gbn_send(int sockfd, const void *buf, size_t len, int flags){
         for (z = 0; z < pkt_buf_counter; z++) {
             free(pkt_buffer[z]);
         }
-
-        /*
-        int cur_pkt;
-        for (cur_pkt = 0; cur_pkt < num_packets; cur_pkt++) {
-
-            Set current state seq_num to cur_pkt seqnum
-            s.seq_num = pkt_buffer[cur_pkt]->seqnum;
-
-            gbnhdr *DATAACK_packet = malloc(sizeof(*DATAACK_packet));
-            memset(DATAACK_packet->data, 0, sizeof(DATAACK_packet->data));
-
-            printf("Sending packet num %d...\n", i);
-
-            if (sendto(sockfd, pkt_buffer[cur_pkt], sizeof(*pkt_buffer[cur_pkt]), flags, &s.address, s.sock_len) == -1) {
-                perror("Data packet send error");
-                return(-1);
-            }
-
-            printf("DATA_packet content: %s\nDATA_packet sent successfully...\n", pkt_buffer[cur_pkt]->data);
-
-            printf("Waiting for DATAACK packet num %d...\n", cur_pkt);
-
-            last_ack_not_received = s.seq_num + pkt_buffer[cur_pkt]->actual_len;
-
-            if (recvfrom(sockfd, DATAACK_packet, sizeof(*DATAACK_packet), flags, &server, &server_len) == -1) {
-                perror("Data ack packet recv error");
-                return(-1);
-            }
-
-            if (DATAACK_packet->DATAACK) {
-                if (DATAACK_packet->seqnum == last_ack_not_received) {
-                    printf("Expected DATAACK_packet received...\n");
-                }
-                else {
-                    printf("Incorrect DATAACK_packet received...\n");
-                }
-            }
-
-            printf("DATAACK_packet received...\n");
-
-            set to null
-            free(pkt_buffer[cur_pkt]);
-            free(DATAACK_packet);
-
-        }
-        */
-
         return (len);
     }
 
@@ -373,7 +335,7 @@ ssize_t gbn_recv(int sockfd, void *buf, size_t len, int flags){
 
             return(0);
         }
-        printf("Attempt number: %d", attempts);
+        printf("Attempt number: %d\n", attempts);
         /*attempts++*/;
 
     }
@@ -432,13 +394,13 @@ int gbn_close(int sockfd){
             attempts++;
             printf("Attempt number: %d\n", attempts);
 
-            if (maybe_recvfrom(sockfd, FINACK_packet, sizeof(*FINACK_packet), 0, &s.address, &s.sock_len) == -1) {
+            if (recvfrom(sockfd, FINACK_packet, sizeof(*FINACK_packet), 0, &s.address, &s.sock_len) == -1) {
                 if (errno != EINTR) {
                     perror("close FINACK_packet error\n");
                     s.curr_state = CLOSED;
                     free(FIN_packet);
                     free(FINACK_packet);
-                    return(-1);
+                    continue;
                 }
             } else {
                 s.curr_state = CLOSED;
@@ -516,7 +478,7 @@ int gbn_connect(int sockfd, const struct sockaddr *server, socklen_t socklen){
                 if (errno != EINTR) {
                     perror("Recvfrom SYNACK_packet error\n");
                     s.curr_state = CLOSED;
-                    return(-1);
+                    continue;
                 }
             }
 
@@ -644,7 +606,7 @@ int gbn_accept(int sockfd, struct sockaddr *client, socklen_t *socklen){
                 if (errno != EINTR) {
                     perror("SYN receive error\n");
                     s.curr_state = CLOSED;
-                    return(-1);
+                    continue;
                 }
             }
 
